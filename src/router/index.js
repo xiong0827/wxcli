@@ -1,29 +1,29 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import routes from './routes'
+import store from '@/store'
+
+let originPush = VueRouter.prototype.push
 
 Vue.use(VueRouter)
-
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+VueRouter.prototype.push = function (location, resolve, reject) {
+  if (resolve || reject) {
+      originPush.call(this, location, resolve, reject)
+  } else {
+      originPush.call(this, location, () => {}, () => {})
   }
-]
+}
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // return 期望滚动到哪个的位置
+    return {
+        y: 0
+    }
+},
 })
 
 export default router
